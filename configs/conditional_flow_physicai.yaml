@@ -1,0 +1,27 @@
+# Chunk 2 de-risk: conditional flow-matching (state -> action chunk) vs deterministic chunk-BC.
+# Conditional/x1-prediction setting — the actual deliverable form (Diffusion/flow-policy style).
+name: conditional_flow_physicai
+role: finetune
+
+physicai_root: data_raw/physicai
+val_frac: 0.2
+chunk_size: 8          # k action steps generated per conditioning state (CLAUDE.md: k 8-16)
+
+# Conditional flow field (src/models/flow_matching.py: ConditionalFlowField)
+hidden_dim: 128
+num_blocks: 4
+kernel_size: 3
+embed_dim: 64
+
+# Training
+epochs: 100
+batch_size: 256
+lr: 0.0005
+seed: 0
+lambda_smooth: 5.0   # chunk-3 chosen value: velocity+accel matching on predicted chunk (jerk 2.42x->1.44x; 0 = chunk-2 baseline)
+
+# Sampling / evaluation
+sample_steps: 50
+eval_conditions: 1500      # held-out conditions for jerk / inside-range / anchor / chunkMSE
+diversity_conditions: 256  # subset for multimodality (N samples each)
+diversity_samples: 8       # N samples per condition

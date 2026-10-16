@@ -1,0 +1,37 @@
+# Review retraining campaign (review_tasks_for_claude_code.md A1-A4, A6 + axis-robustness), 2026-09-25.
+# Base model/training/eval hyperparameters are read from base_config; only campaign-specific knobs live here.
+base_config: configs/conditional_flow_physicai.yaml
+
+corpora: [being_so101, rayenghali, koch_pickplace5, aloha_tape]
+scales: [1.0, 0.25]
+seeds: [0, 1, 2, 3, 4]
+out_dir: outputs/campaign
+
+# arms: Filtered, update-matched Filtered, Full-Unconditioned, Activity-Conditioned, Quality-Conditioned,
+#       and the per-joint z-scored-axis robustness pair
+arms: [A, A_step, C, B1, B2, A_z, B2_z]
+
+val_chunks: 2048          # held-out usable chunks for the per-epoch validation loss (fixed noise)
+pr_k: 3
+n_best: 8                 # N samples per state for diversity / best-of-N
+
+# A2 output-filtered (rejection on the Full-Unconditioned model)
+reject_max_tries: 64
+
+# A3 temperature sweep on Filtered: x0 ~ N(0, T^2 I)
+temperatures: [1.0, 1.25, 1.5, 2.0, 2.5, 3.0]
+
+# A3 precision-recall curve (same protocol as the precision-matched comparison)
+curve_states: 512
+curve_M: 8
+curve_rhos: [1.0, 0.75, 0.5, 0.25]
+curve_pr_n: 1000
+curve_ref_n: 4000
+
+# A4 state-conditional q: usable neighbours among the k nearest training chunks in normalised state space
+qmode_state_knn: 32
+
+# A6 RQ2 (full data only): quantile levels and the +-band for the conditional sweep / data baseline
+rq2_levels: [0.1, 0.3, 0.5, 0.7, 0.9]
+rq2_band: 0.05
+rq2_states: 1500
